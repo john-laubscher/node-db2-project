@@ -1,11 +1,19 @@
+const db = require("../../data/db-config");
+
 const getAll = () => {
-  // DO YOUR MAGIC
-}
+  console.log("inside the getAll model:");
+};
 
 const getById = () => {
-  // DO YOUR MAGIC
-}
+  console.log("inside getById model:");
+};
 
 const create = () => {
-  // DO YOUR MAGIC
-}
+  console.log("inside create model:");
+};
+
+module.exports = {
+  getAll,
+  getById,
+  create,
+};
