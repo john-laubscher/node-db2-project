@@ -1,6 +1,5 @@
 const Cars = require("../cars/cars-model");
 var vinValidator = require("vin-validator");
-var isValidVin = vinValidator.validate("11111111111111111");
 
 function logger(req, res, next) {
   const timestamp = new Date().toLocaleString();
@@ -27,40 +26,59 @@ async function checkCarId(req, res, next) {
 }
 
 const checkCarPayload = (req, res, next) => {
-  const fieldName = {
-    vin: req.body.vin,
-    make: req.body.make,
-    model: req.body.model,
-    mileage: req.body.mileage,
-  };
-  if (!fieldName) {
-    next({ message: `${fieldName} is missing` });
-  } else {
-    next();
+  const { vin, make, model, mileage } = req.body;
+  try {
+    if (!vin) {
+      next({ status: 400, message: `vin is missing` });
+    } else {
+      if (!make) {
+        next({ status: 400, message: "make is missing" });
+      } else {
+        if (!model) {
+          next({ status: 400, message: "model is missing" });
+        } else {
+          if (!mileage) {
+            next({ status: 400, message: "mileage is missing" });
+          } else {
+            next();
+          }
+        }
+      }
+    }
+  } catch (err) {
+    res.status(404).json({
+      message: "invalid credentials",
+    });
   }
-
-  // if (!req.body.vin || req.body.make || req.body.model || req.body.mileage) {
-  //   next({ message: `${fieldName} is missing` });
-  // } else {
-  //   next();
-  // }
 };
 
 const checkVinNumberValid = (req, res, next) => {
-  if (req.body.vin == !isValidVin) {
-    next({ status: 400, message: `vin ${req.body.vin} is invalid` });
-  } else {
-    next();
+  try {
+    var validVin = vinValidator.validate(req.body.vin);
+    if (!validVin) {
+      next({ status: 400, message: `vin ${req.body.vin} is invalid` });
+    } else {
+      next();
+    }
+  } catch (err) {
+    res.status(404).json({
+      message: "invalid credentials",
+    });
   }
 };
 
 async function checkVinNumberUnique(req, res, next) {
   try {
-    const existingVin = await Cars.getById(req.params.id);
-    if (existingVin) {
+    const allCars = await Cars.getAll();
+    const data = allCars.filter((car) => {
+      if (car.vin === req.body.vin) {
+        return req.body.vin;
+      }
+    });
+
+    if (data.length > 0) {
       next({ status: 400, message: `vin ${req.body.vin} already exists` });
     } else {
-      req.body = existingVin;
       next();
     }
   } catch (err) {
