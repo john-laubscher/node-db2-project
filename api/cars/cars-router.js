@@ -1,6 +1,6 @@
-// DO YOUR MAGIC
 const router = require("express").Router();
 const Cars = require("./cars-model");
+const { checkCarId, checkCarPayload, checkVinNumberValid, checkVinNumberUnique } = require("../cars/cars-middleware");
 
 //routes are connected and working
 
@@ -14,7 +14,7 @@ router.get("/", async (req, res, next) => {
   }
 });
 
-router.get("/:id", async (req, res, next) => {
+router.get("/:id", checkCarId, async (req, res, next) => {
   console.log("inside the get/:id router:");
   Cars.getById(req.params.id)
     .then((car) => {
@@ -23,7 +23,7 @@ router.get("/:id", async (req, res, next) => {
     .catch(next);
 });
 
-router.post("/", async (req, res, next) => {
+router.post("/", checkCarPayload, checkVinNumberValid, checkVinNumberUnique, async (req, res, next) => {
   try {
     const newCar = await Cars.create(req.body);
     res.status(201).json(newCar);
