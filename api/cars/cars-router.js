@@ -5,8 +5,13 @@ const Cars = require("./cars-model");
 //routes are connected and working
 
 router.get("/", async (req, res, next) => {
-  console.log("inside the get/ router:");
-  res.json("inside the get/ router:");
+  try {
+    const cars = await Cars.getAll();
+    console.log("inside the get/ router:");
+    res.json(cars);
+  } catch (err) {
+    next(err);
+  }
 });
 
 router.get("/:id", async (req, res, next) => {
