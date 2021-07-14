@@ -24,8 +24,13 @@ router.get("/:id", async (req, res, next) => {
 });
 
 router.post("/", async (req, res, next) => {
-  console.log("inside the post/ router:");
-  res.json("inside the post/ router:");
+  try {
+    const newCar = await Cars.create(req.body);
+    res.status(201).json(newCar);
+  } catch (err) {
+    console.log(err.message);
+    next(err);
+  }
 });
 
 router.use((err, req, res, next) => {

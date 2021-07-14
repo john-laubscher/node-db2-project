@@ -15,9 +15,11 @@ async function getById(id) {
   return record;
 }
 
-const create = () => {
-  console.log("inside create model:");
-};
+async function create(newCar) {
+  const [id] = await db("cars").insert(newCar);
+  const newlyCreatedCar = await getById(id);
+  return newlyCreatedCar;
+}
 
 module.exports = {
   getAll,
